@@ -17,8 +17,9 @@ type SimPromptCmd struct {
 }
 
 type SimPrompt struct {
-	Prompt string
-	Cmds   map[string]SimPromptCmd
+	Prompt          string
+	Cmds            map[string]SimPromptCmd
+	DefaultCallback func([]string) bool
 }
 
 func NewSimPrompt() *SimPrompt {
@@ -47,6 +48,10 @@ func (sp *SimPrompt) AppendCmd(cmd []string, help string, cb func([]string) bool
 		}
 	}
 	return nil
+}
+
+func (sp *SimPrompt) SetDefaultCallback(cb func([]string) bool) {
+	sp.DefaultCallback = cb
 }
 
 func (sp *SimPrompt) SetPrompt(s string) {
@@ -135,6 +140,17 @@ func (sp *SimPrompt) Run(scan *os.File) chan bool {
 					}
 
 					if !v.Callback(commArgs) {
+						close(endChan)
+						return
+					}
+				} else if sp.DefaultCallback != nil {
+					var ret bool
+					if commArgs != nil {
+						ret = sp.DefaultCallback(append([]string{comm}, commArgs...))
+					} else {
+						ret = sp.DefaultCallback([]string{comm})
+					}
+					if !ret {
 						close(endChan)
 						return
 					}

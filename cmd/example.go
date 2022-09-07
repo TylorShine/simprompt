@@ -31,6 +31,12 @@ func main() {
 		return false
 	})
 
+	// set default callback
+	sp.SetDefaultCallback(func(s []string) bool {
+		fmt.Println("no command Argn:", len(s), ",Argv:", s)
+		return true
+	})
+
 	// nil given, read from os.Stdin
 	done := sp.Run(nil)
 	<-done
