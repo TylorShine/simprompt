@@ -57,6 +57,25 @@ func (sp *SimPrompt) SetCmds(cmds map[string]SimPromptCmd) {
 	sp.Cmds = cmds
 }
 
+func (sp *SimPrompt) SetHelp(cmd, help string) error {
+	if _, ok := sp.Cmds[cmd]; !ok {
+		return errors.New("command \"" + cmd + "\" was not found")
+	} else {
+		c := sp.Cmds[cmd]
+		c.Help = help
+		sp.Cmds[cmd] = c
+	}
+
+	return nil
+}
+
+func (sp *SimPrompt) GetHelp(cmd string) string {
+	if v, ok := sp.Cmds[cmd]; ok {
+		return v.Help
+	}
+	return ""
+}
+
 func (sp *SimPrompt) parseCommand(line string) (command string, args []string) {
 	lineRune := ([]rune)(line)
 	if len(lineRune) <= 0 {
