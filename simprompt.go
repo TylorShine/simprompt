@@ -96,21 +96,33 @@ func (sp *SimPrompt) parseCommand(line string) (command string, args []string) {
 	return commSplit[0], nil
 }
 
+func (sp *SimPrompt) getPipe() (r, w *os.File) {
+	r, w, _ = os.Pipe()
+	return
+}
+
 func (sp *SimPrompt) Run(scan *os.File) chan bool {
 	if scan == nil {
 		scan = os.Stdin
 	}
-	scanner := bufio.NewScanner(scan)
+	// scanner := bufio.NewScanner(scan)
+	scanner := bufio.NewReader(scan)
 
 	endChan := make(chan bool)
 
 	textChan := make(chan string)
 
-	go func() {
-		for scanner.Scan() {
-			textChan <- scanner.Text()
+	readfunc := func() {
+		if s, err := scanner.ReadString(byte('\n')); err == nil {
+			textChan <- string(strings.TrimRight(s, "\r\n"))
 		}
-	}()
+	}
+
+	// go func() {
+	// 	for scanner.Scan() {
+	// 		textChan <- scanner.Text()
+	// 	}
+	// }()
 
 	quitChan := make(chan os.Signal)
 
@@ -120,6 +132,7 @@ func (sp *SimPrompt) Run(scan *os.File) chan bool {
 	go func() {
 		for {
 			fmt.Print("\r" + sp.Prompt)
+			go readfunc()
 			select {
 			case text, ok := <-textChan:
 				if !ok {
