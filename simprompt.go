@@ -11,15 +11,17 @@ import (
 )
 
 type SimPromptCmd struct {
-	Command  string
+	Command  []string
 	Help     string
 	Callback func([]string) bool // Callback(args) => isExit
+	CmdIndex int
 }
 
 type SimPrompt struct {
 	Prompt          string
 	Cmds            map[string]SimPromptCmd
 	DefaultCallback func([]string) bool
+	CmdNum          int
 }
 
 func NewSimPrompt() *SimPrompt {
@@ -42,11 +44,13 @@ func (sp *SimPrompt) AppendCmd(cmd []string, help string, cb func([]string) bool
 
 	for _, v := range cmd {
 		sp.Cmds[v] = SimPromptCmd{
-			Command:  v,
+			Command:  cmd,
 			Help:     help,
 			Callback: cb,
+			CmdIndex: sp.CmdNum,
 		}
 	}
+	sp.CmdNum++
 	return nil
 }
 
