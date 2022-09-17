@@ -114,11 +114,6 @@ func (sp *SimPrompt) parseCommand(line string) (command string, args []string) {
 	return commSplit[0], nil
 }
 
-func (sp *SimPrompt) getPipe() (r, w *os.File) {
-	r, w, _ = os.Pipe()
-	return
-}
-
 func (sp *SimPrompt) Run(scan *os.File) chan bool {
 	if scan == nil {
 		scan = os.Stdin
