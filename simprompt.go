@@ -93,7 +93,7 @@ func (sp *SimPrompt) GetHelpAll() (ret []string) {
 		if _, ok := m[v.CmdIndex]; ok {
 			continue
 		}
-		ret[idx] = fmt.Sprint(v.Command, ":", v.Help)
+		ret[idx] = fmt.Sprint(v.Command, ": ", v.Help)
 		m[v.CmdIndex] = struct{}{}
 		idx++
 		if idx >= len(ret) {
