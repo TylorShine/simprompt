@@ -85,6 +85,20 @@ func (sp *SimPrompt) GetHelp(cmd string) string {
 	return ""
 }
 
+func (sp *SimPrompt) GetHelpAll() (ret []string) {
+	ret = make([]string, sp.CmdNum)
+	idx := 0
+	m := map[int]struct{}{}
+	for _, v := range sp.Cmds {
+		if _, ok := m[v.CmdIndex]; ok {
+			continue
+		}
+		ret[idx] = fmt.Sprint(v.Command, ":", v.Help)
+		m[v.CmdIndex] = struct{}{}
+	}
+	return
+}
+
 func (sp *SimPrompt) parseCommand(line string) (command string, args []string) {
 	lineRune := ([]rune)(line)
 	if len(lineRune) <= 0 {
